@@ -14,6 +14,8 @@ local function testStore(directory)
   store.write(mystore, path, data)
   local retrievedData = store.read(mystore, path)
   assert(data == retrievedData, "read/write data to store")
+
+  store.delete(mystore)
 end
 
 local function testHash()
@@ -22,17 +24,10 @@ local function testHash()
   assert(utils.hash(data) == knownHash, "test hash")
 end
 
-local function deleteDirectory(directory)
-  for file in lfs.dir(directory) do
-    os.remove(directory.."/"..file)
-  end
-  os.remove(directory)
-end
+
 
 
 local testFolder = "teststore"
 
 testStore(testFolder)
 testHash()
-
-deleteDirectory(testFolder)

@@ -2,6 +2,7 @@
 local store = {}
 local io = require("io")
 local lfs = require("lfs")
+local utils = require("utils")
 
 store.new = function(directory)
   if not lfs.attributes(directory) then
@@ -10,12 +11,8 @@ store.new = function(directory)
   return {directory = directory}
 end
 
-store.pull = function(targetStore, targetRef, sourceStore, sourceRef)
-	
-end
-
-store.pullFromPeer = function(store, storeRef, peer, peerRef)
-
+store.delete = function(store)
+  utils.deleteDirectory(store.directory)
 end
 
 store.write = function(store, path, data)
