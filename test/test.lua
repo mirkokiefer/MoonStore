@@ -3,19 +3,17 @@ local ms = require("moonstore")
 local lfs = require("lfs")
 local os = require("os")
 local utils = require("utils")
-local store = ms.store
-local branch = ms.branch
-local peer = ms.peer
+local filestore = require("filestore")
 
-local function testStore(directory)
-  local mystore = ms.store.new(directory)
+local function testFilestore(directory)
+  local mystore = filestore.new(directory)
   local path = "test"
   local data = "abcd"
-  store.write(mystore, path, data)
-  local retrievedData = store.read(mystore, path)
+  filestore.write(mystore, path, data)
+  local retrievedData = filestore.read(mystore, path)
   assert(data == retrievedData, "read/write data to store")
 
-  store.delete(mystore)
+  filestore.delete(mystore)
 end
 
 local function testHash()
@@ -29,5 +27,5 @@ end
 
 local testFolder = "teststore"
 
-testStore(testFolder)
+testFilestore(testFolder)
 testHash()

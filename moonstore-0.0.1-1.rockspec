@@ -11,7 +11,7 @@ build = {
   type = "builtin",
   modules = {
     moonstore = "moonstore.lua",
-    ["moonstore.store"] = "moonstore/store.lua",
+    ["moonstore.filestore"] = "moonstore/filestore.lua",
     ["moonstore.utils"] = "moonstore/utils.lua"
   }
 }
