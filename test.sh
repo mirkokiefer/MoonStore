@@ -1,1 +1,1 @@
-shake
+shake -r
