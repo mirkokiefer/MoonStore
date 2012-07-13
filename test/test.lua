@@ -22,9 +22,6 @@ local function testHash()
   assert(utils.hash(data) == knownHash, "test hash")
 end
 
-
-
-
 local testFolder = "teststore"
 
 testFilestore(testFolder)
