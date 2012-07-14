@@ -22,7 +22,16 @@ local function testHash()
   assert(utils.hash(data) == knownHash, "test hash")
 end
 
+local function testSplitString()
+  local aString = "a/bc/d"
+  local splitted = utils.splitString(aString, "/")
+  assert(splitted[1] == "a")
+  assert(splitted[2] == "bc")
+  assert(splitted[3] == "d")
+end
+
 local testFolder = "teststore"
 
 testFilestore(testFolder)
 testHash()
+testSplitString()
