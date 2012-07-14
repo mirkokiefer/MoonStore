@@ -1,4 +1,4 @@
-
+package.path = "./moonstore/?.lua;" .. package.path
 
 local filestore = require("moonstore.filestore")
 
