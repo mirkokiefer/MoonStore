@@ -4,6 +4,7 @@ source = {
    url = "http://..." -- We don't have one yet
 }
 dependencies = {
+  "lua >= 5.1",
   "luacrypto >= 0.3",
   "luafilesystem >= 1.5"
 }
