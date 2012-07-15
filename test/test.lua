@@ -10,7 +10,9 @@ local function testFilestore(directory)
   local mystore = filestore.new(directory)
   local path = "test"
   local data = "abcd"
-  filestore.write(mystore, path, data)
+  local file = filestore.write(mystore, path)
+  file:write(data)
+  file:close()
   local retrievedData = filestore.read(mystore, path)
   assert(data == retrievedData, "read/write data to store")
 
