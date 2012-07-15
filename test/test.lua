@@ -3,6 +3,7 @@ local ms = require("moonstore")
 local lfs = require("lfs")
 local os = require("os")
 local utils = require("utils")
+list = utils.list
 local filestore = require("filestore")
 
 local function testFilestore(directory)
@@ -35,13 +36,25 @@ local function testUtils()
   local testSplitString = function()
     local aString = "a/bc/d"
     local splitted = utils.splitString(aString, "/")
-    a,b,c = utils.listValues(splitted)
+    local a,b,c = utils.listValues(splitted)
     assert(a == "a" and b == "bc" and c == "d")
+  end
+  local testListToTree = function()
+    local data = {
+      ["a/b"] = "value1",
+      ["a/c"] = "value2",
+      ["d"] = "value3",
+      ["a/e/f"] = "value4"
+    }
+    local dataList = utils.pathTableToList(data)
+    local tree = utils.listToTree(dataList)
+    assert(tree.a.b == "value1" and tree.a.c == "value2" and tree.d == "value3" and tree.a.e.f == "value4")
   end
   testHash()
   testList()
   testListReverse()
   testSplitString()
+  testListToTree()
 end
 
 local function testMoonStore(directory)

@@ -66,4 +66,37 @@ utils.listValues = function(list, maxValues)
   return unpack(array)
 end
 
+utils.pathTableToList = function(table)
+  local list = nil
+  for path, value in pairs(table) do
+    list = utils.listAdd(list, {path=utils.splitString(path, "/"), value=value})
+  end
+  return list
+end
+
+utils.listToTree = function(pathValues)
+  local tree = {}
+  while(pathValues) do
+    local current = pathValues.first
+    local path = current.path
+    if (path.rest) then
+      tree[path.first] = utils.listAdd(tree[path.first], {path = path.rest, value = current.value})
+    else
+      child = current.value
+      tree[path.first] = current.value
+    end
+    pathValues = pathValues.rest
+  end
+  for key, childPathValues in pairs(tree) do
+    if childPathValues.first then
+      tree[key] = utils.listToTree(childPathValues)
+    end
+  end
+  return tree
+end
+
+utils.print = function(data)
+  require 'pl.pretty'.dump(data)
+end
+
 return utils
