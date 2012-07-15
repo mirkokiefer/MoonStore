@@ -33,22 +33,22 @@ end
 
 utils.list = function(first, ...)
   if first == nil then return nil end
-  return {value = first, rest = utils.list(...)}
+  return {first = first, rest = utils.list(...)}
 end
 
 utils.listAdd = function(list, value)
-  return {value = value, rest = list}
+  return {first = value, rest = list}
 end
 
 utils.listAt = function(list, index)
-  if index == 1 then return list.value end
+  if index == 1 then return list.first end
   return listAt(list.rest, index-1)
 end
 
 utils.listReverse = function(list)
   reversed = nil
   while(list) do
-    reversed = utils.listAdd(reversed, list.value)
+    reversed = utils.listAdd(reversed, list.first)
     list = list.rest
   end
   return reversed
@@ -58,7 +58,7 @@ utils.listValues = function(list, maxValues)
   array = {}
   index = 1
   while(list) do
-    array[index] = list.value
+    array[index] = list.first
     if maxValues and i >= maxValues then break end
     list = list.rest
     index = index + 1

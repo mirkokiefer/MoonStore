@@ -24,7 +24,7 @@ local function testUtils()
   end
   local testList = function()
     list = utils.list(1,2,3)
-    assert(list.value==1 and list.rest.value==2 and list.rest.rest.value ==3)
+    assert(list.first==1 and list.rest.first==2 and list.rest.rest.first ==3)
   end
   local testListReverse = function()
     list = utils.list(1,2,3)
