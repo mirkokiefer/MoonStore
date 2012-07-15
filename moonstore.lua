@@ -65,8 +65,18 @@ moonstore.paths = function(store, commit)
 
 end
 
-moonstore.parentCommits = function(store, commit)
+moonstore.rootSegments = function(store, commit)
+  local obj = readObject(store, commit)
+  return readObject(store, obj.tree)
+end
 
+moonstore.childSegments = function(store, segmentHash)
+  return readObject(store, segmentHash)
+end
+
+moonstore.parentCommits = function(store, commit)
+  local obj = readObject(store, commit)
+  return obj.parents
 end
 
 moonstore.metaDiff = function(store, fromCommit, toCommit)
