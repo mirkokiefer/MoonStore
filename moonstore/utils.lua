@@ -120,6 +120,12 @@ utils.deserializeString = function(string)
   return table.data
 end
 
+utils.serializeToString = function(data)
+  local file = utils.memoryFile()
+  utils.serialize(file, data)
+  return file.data()
+end
+
 utils.deserialize = function(file)
   local data = file:read("*a")
   file:close()

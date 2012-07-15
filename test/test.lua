@@ -54,9 +54,8 @@ local function testUtils()
   end
   local testSerialize = function()
     local data = {a = 1, b = "hello", c = {1,2}}
-    local memoryFile = utils.memoryFile()
-    utils.serialize(memoryFile, data)
-    local deserialized = utils.deserializeString(memoryFile.data())
+    local string = utils.serializeToString(data)
+    local deserialized = utils.deserializeString(string)
     assert(deserialized.a == data.a and deserialized.b == data.b)
     assert(deserialized.c[1] == data.c[1] and deserialized.c[2] == data.c[2])
   end
