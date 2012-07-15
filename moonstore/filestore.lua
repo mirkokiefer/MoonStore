@@ -15,8 +15,10 @@ store.delete = function(store)
   utils.deleteDirectory(store.directory)
 end
 
-store.write = function(store, path)
-  return assert(io.open(store.directory.."/"..path..".txt", "w"))
+store.write = function(store, path, data)
+  local file = assert(io.open(store.directory.."/"..path..".txt", "w"))
+  file:write(data)
+  file:close()
 end
 
 store.read = function(store, path)
