@@ -25,7 +25,7 @@ end
 
 utils.tableCopy = function(aTable)
   local t2 = {}
-  for k,v in pairs(t) do
+  for k,v in pairs(aTable) do
     t2[k] = v
   end
   return t2
@@ -88,7 +88,7 @@ utils.listToTree = function(pathValues)
     pathValues = pathValues.rest
   end
   for key, childPathValues in pairs(tree) do
-    if childPathValues.first then
+    if childPathValues and childPathValues.first then
       tree[key] = utils.listToTree(childPathValues)
     end
   end
