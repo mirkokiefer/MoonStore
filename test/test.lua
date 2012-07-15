@@ -50,11 +50,20 @@ local function testUtils()
     local tree = utils.listToTree(dataList)
     assert(tree.a.b == "value1" and tree.a.c == "value2" and tree.d == "value3" and tree.a.e.f == "value4")
   end
+  local testSerialize = function()
+    local data = {a = 1, b = "hello", c = {1,2}}
+    local memoryFile = utils.memoryFile()
+    utils.serialize(memoryFile, data)
+    local deserialized = utils.deserializeString(memoryFile.data())
+    assert(deserialized.a == data.a and deserialized.b == data.b)
+    assert(deserialized.c[1] == data.c[1] and deserialized.c[2] == data.c[2])
+  end
   testHash()
   testList()
   testListReverse()
   testSplitString()
   testListToTree()
+  testSerialize()
 end
 
 local function testMoonStore(directory)

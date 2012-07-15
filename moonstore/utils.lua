@@ -99,4 +99,49 @@ utils.print = function(data)
   require 'pl.pretty'.dump(data)
 end
 
+utils.memoryFile = function()
+  local data = ""
+  local file = {
+    write = function(newData)
+      data = data .. newData
+    end,
+    close = function() end,
+    data = function() return data end
+  }
+  return file
+end
+
+utils.deserializeString = function(string)
+  string = "data = " .. string
+  local table = {}
+  local f = assert(loadstring(string))
+  setfenv(f, table)
+  f()
+  return table.data
+end
+
+utils.deserialize = function(file)
+  local data = file:read("*a")
+  file:close()
+  return utils.deserializeString(data)
+end
+
+utils.serialize = function(file, o)
+  if type(o) == "number" then
+    file.write(o)
+  elseif type(o) == "string" then
+    file.write(string.format("%q", o))
+  elseif type(o) == "table" then
+    file.write("{\n")
+    for k,v in pairs(o) do
+      file.write("  ["); utils.serialize(file, k); file.write("] = ")
+      utils.serialize(file, v)
+      file.write(",\n")
+    end
+    file.write("}\n")
+  else
+    error("cannot serialize a " .. type(o))
+  end
+end
+
 return utils
