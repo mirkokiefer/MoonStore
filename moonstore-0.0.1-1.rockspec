@@ -5,8 +5,7 @@ source = {
 }
 dependencies = {
   "lua >= 5.1",
-  "luacrypto >= 0.3",
-  "luafilesystem >= 1.5"
+  "luacrypto >= 0.3"
 }
 build = {
   type = "builtin",

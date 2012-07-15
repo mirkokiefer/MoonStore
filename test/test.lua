@@ -1,6 +1,5 @@
 package.path = "../moonstore/?.lua;" .. "../?.lua;" .. package.path
 local ms = require("moonstore")
-local lfs = require("lfs")
 local os = require("os")
 local utils = require("utils")
 list = utils.list
@@ -10,10 +9,12 @@ local function testFilestore(directory)
   local mystore = filestore.new(directory)
   local path = "test"
   local data = "abcd"
-  local file = filestore.write(mystore, path, data)
+  filestore.write(mystore, path, data)
   local retrievedData = filestore.read(mystore, path)
   assert(data == retrievedData, "read/write data to store")
-
+  filestore.writeBlob(mystore, path, data)
+  local retrievedData1 = filestore.readBlob(mystore, path)
+  assert(data == retrievedData1, "read/write blob to store")
   filestore.delete(mystore)
 end
 
@@ -87,8 +88,6 @@ local function testMoonStore(directory)
   ms.delete(store)
 end
 
-local testFolder = "teststore"
-
-testFilestore(testFolder)
+testFilestore("teststore")
 testUtils()
-testMoonStore(testFolder)
+testMoonStore("testmoon")
