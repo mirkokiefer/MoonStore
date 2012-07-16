@@ -82,8 +82,8 @@ local function testMoonStore(directory)
   }
   local commit1 = ms.commit(store, nil, data1)
   local commit2 = ms.commit(store, commit1, data2)
-  assert(commit1 == "96bd61764cf3afc07c0b95b8f1a705258ac3e6a7")
-  assert(commit2 == "7ad581877d437959d48484e33fd461c62122d81f")
+  assert(commit1 == "505ee8872573da12e488b6bf9fd3aafca6e84b9d")
+  assert(commit2 == "34f9267379d5da5f31cdfd5b951c0b27a752b633")
 
   ms.delete(store)
 end

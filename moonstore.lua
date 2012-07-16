@@ -41,14 +41,14 @@ writeChangedTree = function(store, oldTree, changedTree)
   local newTree = utils.tableCopy(oldTree)
   for key, child in pairs(changedTree) do
     if (type(child) == "table") then
-      local oldChildTree = {}
-      if(oldTree[key]) then oldChildTree = readTree(store, oldTree[key]) end
-      newTree[key] = writeChangedTree(store, oldChildTree, child)
+      local oldChildTree = {trees={}, blobs={}}
+      if(oldTree.trees[key]) then oldChildTree = readTree(store, oldTree.trees[key]) end
+      newTree.trees[key] = writeChangedTree(store, oldChildTree, child)
     else
       if (child == false) then
-        newTree[key] = nil
+        newTree.blobs[key] = nil
       else
-        newTree[key] = writeBlob(store, child)
+        newTree.blobs[key] = writeBlob(store, child)
       end
     end
   end
@@ -58,7 +58,7 @@ end
 moonstore.commit = function(store, parentCommit, data)
   local dataList = utils.pathTableToList(data)
   local changedTree = utils.listToTree(dataList)
-  local parentCommitTree = {}
+  local parentCommitTree = {trees={}, blobs={}}
   if (parentCommit) then
     local parentCommitObj = readCommit(store, parentCommit)
     parentCommitTree = readTree(store, parentCommitObj.tree)
