@@ -24,37 +24,37 @@ local Commit = {
 }
 
 local readBlob = function(store, hash)
-  return store.storeModule.readBlob(store.storeObj, hash)
+  return store.backend.readBlob(hash)
 end
 local writeBlob = function(store, data)
   local hash = utils.hash(data)
-  store.storeModule.writeBlob(store.storeObj, hash, data)
+  store.backend.writeBlob(hash, data)
   return hash
 end
 local readCommit = function(store, hash)
-  return Commit.deserialize(store.storeModule.readCommit(store.storeObj, hash))
+  return Commit.deserialize(store.backend.readCommit(hash))
 end
 local writeCommit = function(store, parentCommits, tree)
   local commit = Commit.new(parentCommits, tree)
   local commitSerialized = Commit.serialize(commit)
   local commitHash = utils.hash(commitSerialized)
-  store.storeModule.writeCommit(store.storeObj, commitHash, commitSerialized)
+  store.backend.writeCommit(commitHash, commitSerialized)
   return commitHash
 end
 local readTree = function(store, hash)
-  return Tree.deserialize(store.storeModule.readTree(store.storeObj, hash))
+  return Tree.deserialize(store.backend.readTree(hash))
 end
 local writeTree = function(store, aTree)
   local serialized = Tree.serialize(aTree)
   local hash = utils.hash(serialized)
-  store.storeModule.writeTree(store.storeObj, hash, serialized)
+  store.backend.writeTree(hash, serialized)
   return hash
 end
 
 moonstore = {}
 moonstore.new = function(directory)
-  local storeBackend = filestore.new(directory)
-  return {storeObj = storeBackend, storeModule = filestore}
+  local storeBackend = filestore(directory)
+  return {backend = storeBackend}
 end
 
 writeChangedTree = function(store, oldTree, changedTree)
@@ -124,7 +124,7 @@ moonstore.applyDiff = function(store, commit, diff)
 end
 
 moonstore.delete = function(store)
-  store.storeModule.delete(store.storeObj)
+  store.backend.delete(store.storeObj)
 end
 
 return moonstore

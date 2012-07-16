@@ -6,16 +6,16 @@ list = utils.list
 local filestore = require("filestore")
 
 local function testFilestore(directory)
-  local mystore = filestore.new(directory)
+  local mystore = filestore(directory)
   local path = "test"
   local data = "abcd"
-  filestore.write(mystore, path, data)
-  local retrievedData = filestore.read(mystore, path)
+  mystore.write(path, data)
+  local retrievedData = mystore.read(path)
   assert(data == retrievedData, "read/write data to store")
-  filestore.writeBlob(mystore, path, data)
-  local retrievedData1 = filestore.readBlob(mystore, path)
+  mystore.writeBlob(path, data)
+  local retrievedData1 = mystore.readBlob(path)
   assert(data == retrievedData1, "read/write blob to store")
-  filestore.delete(mystore)
+  mystore.delete()
 end
 
 local function testUtils()
