@@ -10,7 +10,17 @@ local Tree = {
   setChildTree = function(self, key, childTree) self.trees[key] = childTree end,
   childTree = function(self, key) return self.trees[key] end,
   setChildBlob = function(self, key, childBlob) self.blobs[key] = childBlob end,
-  childBlob = function(self, key) return self.blobs[key] end
+  childBlob = function(self, key) return self.blobs[key] end,
+  serialize = function(self) return utils.serializeToString(self) end,
+  deserialize = function(string) return utils.deserializeString(string) end
+}
+
+local Commit = {
+  new = function(parentCommits, tree) return {parents = parentCommits, tree = tree} end,
+  tree = function(self) return self.tree end,
+  parents = function(self) return self.parents end,
+  serialize = function(self) return utils.serializeToString(self) end,
+  deserialize = function(string) return utils.deserializeString(string) end
 }
 
 local readBlob = function(store, hash)
@@ -22,20 +32,20 @@ local writeBlob = function(store, data)
   return hash
 end
 local readCommit = function(store, hash)
-  return utils.deserializeString(store.storeModule.readCommit(store.storeObj, hash))
+  return Commit.deserialize(store.storeModule.readCommit(store.storeObj, hash))
 end
 local writeCommit = function(store, parentCommits, tree)
-  local commit = {parents = parentCommits, tree = tree}
-  local commitSerialized = utils.serializeToString(commit)
+  local commit = Commit.new(parentCommits, tree)
+  local commitSerialized = Commit.serialize(commit)
   local commitHash = utils.hash(commitSerialized)
   store.storeModule.writeCommit(store.storeObj, commitHash, commitSerialized)
   return commitHash
 end
 local readTree = function(store, hash)
-  return utils.deserializeString(store.storeModule.readTree(store.storeObj, hash))
+  return Tree.deserialize(store.storeModule.readTree(store.storeObj, hash))
 end
 local writeTree = function(store, aTree)
-  local serialized = utils.serializeToString(aTree)
+  local serialized = Tree.serialize(aTree)
   local hash = utils.hash(serialized)
   store.storeModule.writeTree(store.storeObj, hash, serialized)
   return hash
@@ -73,7 +83,7 @@ moonstore.commit = function(store, parentCommit, data)
   local parentCommitTree = Tree.new()
   if (parentCommit) then
     local parentCommitObj = readCommit(store, parentCommit)
-    parentCommitTree = readTree(store, parentCommitObj.tree)
+    parentCommitTree = readTree(store, Commit.tree(parentCommitObj))
   end
   local treeHash = writeChangedTree(store, parentCommitTree, changedTree)
   return writeCommit(store, {parentCommit}, treeHash)
@@ -89,7 +99,7 @@ end
 
 moonstore.rootSegments = function(store, commit)
   local obj = readCommit(store, commit)
-  return readTree(store, obj.tree)
+  return readTree(store, Commit.tree(obj))
 end
 
 moonstore.childSegments = function(store, segmentHash)
@@ -98,7 +108,7 @@ end
 
 moonstore.parentCommits = function(store, commit)
   local obj = readCommit(store, commit)
-  return obj.parents
+  return Commit.parents(obj)
 end
 
 moonstore.metaDiff = function(store, fromCommit, toCommit)
