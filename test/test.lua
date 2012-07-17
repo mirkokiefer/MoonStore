@@ -67,7 +67,7 @@ local function testUtils()
 end
 
 local function testMoonStore(directory)
-  local store = ms.new(directory)
+  local store = ms(directory)
   local data1 = {
     ["a/b"] = "value1",
     ["a/c/g"] = "value2",
@@ -80,12 +80,12 @@ local function testMoonStore(directory)
     ["d"] = false,
     ["a/e/g"] = "new_value"
   }
-  local commit1 = ms.commit(store, nil, data1)
-  local commit2 = ms.commit(store, commit1, data2)
+  local commit1 = store.commit(nil, data1)
+  local commit2 = store.commit(commit1, data2)
   assert(commit1 == "505ee8872573da12e488b6bf9fd3aafca6e84b9d")
   assert(commit2 == "34f9267379d5da5f31cdfd5b951c0b27a752b633")
 
-  ms.delete(store)
+  store.delete(store)
 end
 
 testFilestore("teststore")

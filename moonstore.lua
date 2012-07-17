@@ -23,108 +23,112 @@ local Commit = {
   deserialize = function(string) return utils.deserializeString(string) end
 }
 
-local readBlob = function(store, hash)
-  return store.backend.readBlob(hash)
-end
-local writeBlob = function(store, data)
-  local hash = utils.hash(data)
-  store.backend.writeBlob(hash, data)
-  return hash
-end
-local readCommit = function(store, hash)
-  return Commit.deserialize(store.backend.readCommit(hash))
-end
-local writeCommit = function(store, parentCommits, tree)
-  local commit = Commit.new(parentCommits, tree)
-  local commitSerialized = Commit.serialize(commit)
-  local commitHash = utils.hash(commitSerialized)
-  store.backend.writeCommit(commitHash, commitSerialized)
-  return commitHash
-end
-local readTree = function(store, hash)
-  return Tree.deserialize(store.backend.readTree(hash))
-end
-local writeTree = function(store, aTree)
-  local serialized = Tree.serialize(aTree)
-  local hash = utils.hash(serialized)
-  store.backend.writeTree(hash, serialized)
-  return hash
-end
-
-moonstore = {}
-moonstore.new = function(directory)
-  local storeBackend = filestore(directory)
-  return {backend = storeBackend}
-end
-
-writeChangedTree = function(store, oldTree, changedTree)
-  local newTree = utils.tableCopy(oldTree)
-  for key, child in pairs(changedTree) do
-    if (type(child) == "table") then
-      local oldChildTree
-      local oldChildTreeHash = Tree.childTree(oldTree, key)
-      if(oldChildTreeHash) then oldChildTree = readTree(store, oldChildTreeHash)
-      else oldChildTree = Tree.new() end
-      Tree.setChildTree(newTree, key, writeChangedTree(store, oldChildTree, child))
-    else
-      if (child == false) then
-        Tree.setChildBlob(newTree, key, nil)
+local newMoonstore = function(directory)
+  local backend = filestore(directory)
+  local moonstore = {}
+  local readBlob = function(hash)
+    return backend.readBlob(hash)
+  end
+  local writeBlob = function(data)
+    local hash = utils.hash(data)
+    backend.writeBlob(hash, data)
+    return hash
+  end
+  local readCommit = function(hash)
+    return Commit.deserialize(backend.readCommit(hash))
+  end
+  local writeCommit = function(parentCommits, tree)
+    local commit = Commit.new(parentCommits, tree)
+    local commitSerialized = Commit.serialize(commit)
+    local commitHash = utils.hash(commitSerialized)
+    backend.writeCommit(commitHash, commitSerialized)
+    return commitHash
+  end
+  local readTree = function(hash)
+    return Tree.deserialize(backend.readTree(hash))
+  end
+  local writeTree = function(aTree)
+    local serialized = Tree.serialize(aTree)
+    local hash = utils.hash(serialized)
+    backend.writeTree(hash, serialized)
+    return hash
+  end
+  local writeChangedTree
+  writeChangedTree = function(oldTree, changedTree)
+    local newTree = utils.tableCopy(oldTree)
+    for key, child in pairs(changedTree) do
+      if (type(child) == "table") then
+        local oldChildTree
+        local oldChildTreeHash = Tree.childTree(oldTree, key)
+        if(oldChildTreeHash) then oldChildTree = readTree(oldChildTreeHash)
+        else oldChildTree = Tree.new() end
+        Tree.setChildTree(newTree, key, writeChangedTree(oldChildTree, child))
       else
-        Tree.setChildBlob(newTree, key, writeBlob(store, child))
+        if (child == false) then
+          Tree.setChildBlob(newTree, key, nil)
+        else
+          Tree.setChildBlob(newTree, key, writeBlob(child))
+        end
       end
     end
+    return writeTree(newTree)
   end
-  return writeTree(store, newTree)
-end
 
-moonstore.commit = function(store, parentCommit, data)
-  local dataList = utils.pathTableToList(data)
-  local changedTree = utils.listToTree(dataList)
-  local parentCommitTree = Tree.new()
-  if (parentCommit) then
-    local parentCommitObj = readCommit(store, parentCommit)
-    parentCommitTree = readTree(store, Commit.tree(parentCommitObj))
+  moonstore.commit = function(parentCommit, data)
+    local dataList = utils.pathTableToList(data)
+    local changedTree = utils.listToTree(dataList)
+    local parentCommitTree = Tree.new()
+    if (parentCommit) then
+      local parentCommitObj = readCommit(parentCommit)
+      parentCommitTree = readTree(Commit.tree(parentCommitObj))
+    end
+    local treeHash = writeChangedTree(parentCommitTree, changedTree)
+    return writeCommit({parentCommit}, treeHash)
   end
-  local treeHash = writeChangedTree(store, parentCommitTree, changedTree)
-  return writeCommit(store, {parentCommit}, treeHash)
+
+  moonstore.read = function(commit, path)
+
+  end
+
+  moonstore.paths = function(commit)
+
+  end
+
+  moonstore.rootSegments = function(commit)
+    local obj = readCommit(commit)
+    return readTree(Commit.tree(obj))
+  end
+
+  moonstore.childSegments = function(segmentHash)
+    return readTree(segmentHash)
+  end
+
+  moonstore.parentCommits = function(commit)
+    local obj = readCommit(commit)
+    return Commit.parents(obj)
+  end
+
+  moonstore.merge = function(commit1, commit2)
+
+  end
+
+  moonstore.metaDiff = function(fromCommit, toCommit)
+
+  end
+
+  moonstore.diff = function(fromCommit, toCommit)
+
+  end
+
+  moonstore.applyDiff = function(commit, diff)
+
+  end
+
+  moonstore.delete = function()
+    backend.delete()
+  end
+
+  return moonstore
 end
 
-moonstore.read = function(store, commit, path)
-
-end
-
-moonstore.paths = function(store, commit)
-
-end
-
-moonstore.rootSegments = function(store, commit)
-  local obj = readCommit(store, commit)
-  return readTree(store, Commit.tree(obj))
-end
-
-moonstore.childSegments = function(store, segmentHash)
-  return readTree(store, segmentHash)
-end
-
-moonstore.parentCommits = function(store, commit)
-  local obj = readCommit(store, commit)
-  return Commit.parents(obj)
-end
-
-moonstore.metaDiff = function(store, fromCommit, toCommit)
-
-end
-
-moonstore.diff = function(store, fromCommit, toCommit)
-
-end
-
-moonstore.applyDiff = function(store, commit, diff)
-
-end
-
-moonstore.delete = function(store)
-  store.backend.delete(store.storeObj)
-end
-
-return moonstore
+return newMoonstore
