@@ -5,7 +5,6 @@ local utils = require("utils")
 
 storePaths = {
   Blob = "blobs/",
-  Commit = "commits/",
   Tree = "trees/"
 }
 

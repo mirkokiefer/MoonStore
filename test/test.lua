@@ -82,10 +82,10 @@ local function testMoonStore(directory)
     ["d"] = false,
     ["a/e/g"] = "new_value"
   }
-  local commit1 = store.commit(nil, data1)
-  local commit2 = store.commit(commit1, data2)
-  assert(commit1 == "505ee8872573da12e488b6bf9fd3aafca6e84b9d")
-  assert(commit2 == "34f9267379d5da5f31cdfd5b951c0b27a752b633")
+  local head1 = store.commit(nil, data1)
+  local head2 = store.commit(head1, data2)
+  assert(head1 == "785d3cc7fdf7b63d5a8ca8c3f6b70ba7645660c9")
+  assert(head2 == "26213fd343ce34c6caad2663963cec4250d65cfa")
 
   store.delete(store)
 end
