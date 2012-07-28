@@ -40,8 +40,7 @@ local newMoonstore = function(directory)
   local readCommit = function(hash)
     return Commit.deserialize(backend.readCommit(hash))
   end
-  local writeCommit = function(parentCommits, tree)
-    local commit = Commit.new(parentCommits, tree)
+  local writeCommit = function(commit)
     local commitSerialized = Commit.serialize(commit)
     local commitHash = utils.hash(commitSerialized)
     backend.writeCommit(commitHash, commitSerialized)
@@ -86,7 +85,7 @@ local newMoonstore = function(directory)
       parentCommitTree = readTree(Commit.tree(parentCommitObj))
     end
     local treeHash = writeChangedTree(parentCommitTree, changedTree)
-    return writeCommit({parentCommit}, treeHash)
+    return writeCommit(Commit.new({parentCommit}, treeHash))
   end
 
   moonstore.read = function(commit, path)
