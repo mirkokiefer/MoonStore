@@ -35,10 +35,12 @@ local function testUtils()
     assert(a==3 and b==2 and c==1)
   end
   local testSplitString = function()
-    local aString = "a/bc/d"
+    local aString = "/a/bc/d"
     local splitted = utils.splitString(aString, "/")
     local a,b,c = utils.listValues(splitted)
-    assert(a == "a" and b == "bc" and c == "d")
+    assert(a == "a")
+    assert(b == "bc")
+    assert(c == "d")
   end
   local testListToTree = function()
     local data = {
