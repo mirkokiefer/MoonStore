@@ -2,7 +2,6 @@ package.path = "./moonstore/?.lua;" .. package.path
 local table = require("table")
 local filestore = require("moonstore.filestore")
 local utils = require("moonstore.utils")
-local url = require("url")
 
 local Tree = {
   new = function(childTrees, childBlobs)
