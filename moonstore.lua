@@ -62,15 +62,16 @@ local newMoonstore = function(directory)
   local moonstore = {}
   local backend = backendWrapper(directory)
   local writeChangedTree
-  writeChangedTree = function(oldTree, changedTree)
+  writeChangedTree = function(oldTreeHash, changedTree)
+    local oldTree
+    if (oldTreeHash) then oldTree = backend.readTree(oldTreeHash)
+    else oldTree = Tree.new() end
     local newTree = utils.tableCopy(oldTree)
     for key, child in pairs(changedTree) do
       if (type(child) == "table") then
         local oldChildTree
         local oldChildTreeHash = Tree.childTree(oldTree, key)
-        if(oldChildTreeHash) then oldChildTree = backend.readTree(oldChildTreeHash)
-        else oldChildTree = Tree.new() end
-        Tree.setChildTree(newTree, key, writeChangedTree(oldChildTree, child))
+        Tree.setChildTree(newTree, key, writeChangedTree(oldChildTreeHash, child))
       else
         if (child == false) then
           Tree.setChildBlob(newTree, key, nil)
@@ -85,12 +86,12 @@ local newMoonstore = function(directory)
   moonstore.commit = function(parentCommit, data)
     local dataList = utils.pathTableToList(data)
     local changedTree = utils.listToTree(dataList)
-    local parentCommitTree = Tree.new()
+    local parentCommitTreeHash
     if (parentCommit) then
       local parentCommitObj = backend.readCommit(parentCommit)
-      parentCommitTree = backend.readTree(Commit.tree(parentCommitObj))
+      parentCommitTreeHash = Commit.tree(parentCommitObj)
     end
-    local treeHash = writeChangedTree(parentCommitTree, changedTree)
+    local treeHash = writeChangedTree(parentCommitTreeHash, changedTree)
     return backend.writeCommit(Commit.new({parentCommit}, treeHash))
   end
 
