@@ -2,6 +2,7 @@ package.path = "./moonstore/?.lua;" .. package.path
 local table = require("table")
 local filestore = require("moonstore.filestore")
 local utils = require("moonstore.utils")
+local url = require("url")
 
 local Tree = {
   new = function(childTrees, childBlobs)
@@ -11,6 +12,8 @@ local Tree = {
   childTree = function(self, key) return self.trees[key] end,
   setChildBlob = function(self, key, childBlob) self.blobs[key] = childBlob end,
   childBlob = function(self, key) return self.blobs[key] end,
+  childBlobs = function(self) return self.blobs end,
+  childTrees = function(self) return self.trees end,
   serialize = function(self) return utils.serializeToString(self) end,
   deserialize = function(string) return utils.deserializeString(string) end
 }
