@@ -92,6 +92,13 @@ local newMoonstore = function(directory)
     return read(treeHash, pathList)
   end
 
+  moonstore.blob = backend.readBlob
+
+  moonstore.readBlob = function(treeHash, path)
+    local hash = moonstore.read(treeHash, path)
+    return backend.readBlob(hash)
+  end
+
   moonstore.paths = function(commit)
 
   end

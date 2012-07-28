@@ -89,6 +89,10 @@ local function testMoonStore(directory)
   
   local value1Hash = store.read(head2, "a/b")
   assert(value1Hash == "96a70ad2e8124220914716a3614ca6e742174321")
+  local value1 = store.blob(value1Hash)
+  assert(value1 == "value1_changed")
+  local value1a = store.readBlob(head2, "a/b")
+  assert(value1a == "value1_changed")
 
   store.delete(store)
 end
