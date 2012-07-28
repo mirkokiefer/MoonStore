@@ -94,6 +94,10 @@ local function testMoonStore(directory)
   local value1a = store.readBlob(head2, "a/b")
   assert(value1a == "value1_changed")
 
+  local childHead = store.read(head2, "a")
+  local value1b = store.readBlob(childHead, "b")
+  assert(value1b == "value1_changed")
+
   store.delete(store)
 end
 
