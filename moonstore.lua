@@ -3,6 +3,8 @@ local table = require("table")
 local filestore = require("moonstore.filestore")
 local utils = require("moonstore.utils")
 
+local pathToList = function(path) return utils.splitString(path, "/") end
+
 local Tree = {
   new = function(childTrees, childBlobs)
     return {trees=childTrees or {}, blobs=childBlobs or {}}
@@ -73,8 +75,21 @@ local newMoonstore = function(directory)
     return writeChangedTree(parentTreeHash, changedTree)
   end
 
-  moonstore.read = function(commit, path)
-
+  local read
+  read = function(treeHash, path)
+    local tree = backend.readTree(treeHash)
+    local childTreeHash = Tree.childTree(tree, path.first)
+    if (childTreeHash) then
+      if(path.rest) then return read(childTreeHash, path.rest)
+      else return childTreeHash end
+    else
+      if(path.rest) then return nil
+      else return Tree.childBlob(tree, path.first) end
+    end
+  end
+  moonstore.read = function(treeHash, path)
+    local pathList = pathToList(path)
+    return read(treeHash, pathList)
   end
 
   moonstore.paths = function(commit)

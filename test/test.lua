@@ -86,6 +86,9 @@ local function testMoonStore(directory)
   local head2 = store.commit(head1, data2)
   assert(head1 == "785d3cc7fdf7b63d5a8ca8c3f6b70ba7645660c9")
   assert(head2 == "26213fd343ce34c6caad2663963cec4250d65cfa")
+  
+  local value1Hash = store.read(head2, "a/b")
+  assert(value1Hash == "96a70ad2e8124220914716a3614ca6e742174321")
 
   store.delete(store)
 end
