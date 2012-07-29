@@ -84,8 +84,8 @@ local function testMoonStore(directory)
   }
   local head1 = store.commit(nil, data1)
   local head2 = store.commit(head1, data2)
-  assert(head1 == "785d3cc7fdf7b63d5a8ca8c3f6b70ba7645660c9")
-  assert(head2 == "26213fd343ce34c6caad2663963cec4250d65cfa")
+  assert(head1 == "f18bb6c5d07c6a1ecc157101ef5bdf54bfd34891")
+  assert(head2 == "1f7682314f624cd35a39313d7e60fdd4b0160ea4")
   
   local value1Hash = store.read(head2, "a/b")
   assert(value1Hash == "96a70ad2e8124220914716a3614ca6e742174321")

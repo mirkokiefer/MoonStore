@@ -7,7 +7,7 @@ local pathToList = function(path) return utils.splitString(path, "/") end
 
 local Tree = {
   new = function(childTrees, childBlobs)
-    return {trees=childTrees or {}, blobs=childBlobs or {}}
+    return {trees=childTrees or {}, blobs=childBlobs or {}, parents={}}
   end,
   setChildTree = function(self, key, childTree) self.trees[key] = childTree end,
   childTree = function(self, key) return self.trees[key] end,
@@ -52,7 +52,7 @@ local newMoonstore = function(directory)
     if (oldTreeHash) then oldTree = backend.readTree(oldTreeHash)
     else oldTree = Tree.new() end
     local newTree = utils.tableCopy(oldTree)
-    newTree.previous = {oldTreeHash}
+    newTree.parents = {oldTreeHash}
     for key, child in pairs(changedTree) do
       if (type(child) == "table") then
         local oldChildTree
