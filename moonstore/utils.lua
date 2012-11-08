@@ -38,13 +38,16 @@ utils.list = function(first, ...)
   return {first = first, rest = utils.list(...)}
 end
 
-utils.listAdd = function(list, value)
-  return {first = value, rest = list}
+utils.listAdd = function(list, value, ...)
+  if value == nil then return list end
+  local restList = utils.listAdd(list, ...)
+  return {first = value, rest = restList}
 end
 
 utils.listAt = function(list, index)
+  if not list then return nil end
   if index == 1 then return list.first end
-  return listAt(list.rest, index-1)
+  return utils.listAt(list.rest, index-1)
 end
 
 utils.listReverse = function(list)

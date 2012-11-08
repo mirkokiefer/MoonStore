@@ -25,8 +25,11 @@ local function testUtils()
     assert(utils.hash(data) == knownHash, "test hash")
   end
   local testList = function()
-    list = utils.list(1,2,3)
-    assert(list.first==1 and list.rest.first==2 and list.rest.rest.first ==3)
+    local list = utils.list(1,2,3)
+    assert(list.first==1 and list.rest.first==2 and list.rest.rest.first==3)
+
+    local list1 = utils.listAdd(list, 4, 5)
+    assert(list1.first == 4 and list1.rest.first == 5)
   end
   local testListReverse = function()
     list = utils.list(1,2,3)
@@ -97,6 +100,13 @@ local function testMoonStore(directory)
   local childHead = store.read(head2, "a")
   local value1b = store.readBlob(childHead, "b")
   assert(value1b == "value1_changed")
+
+  --[[local childHead1 = store.commit(childHead, {f="value6"})
+  local head3 = store.merge(head2, childHead1, "a")
+
+  local value6 = store.read(head3, "a/f")
+  assert(value6 == "value6")
+  --]]
 
   store.delete(store)
 end

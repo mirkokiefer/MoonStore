@@ -99,12 +99,43 @@ local newMoonstore = function(directory)
     return backend.readBlob(hash)
   end
 
-  moonstore.paths = function(commit)
+  local commonBase
+  local commonBase = function(tree1Hash, tree2Hash)
+    if(tree1Hash == tree2Hash) then return tree1Hash end
+    local tree1 = readTree(tree1Hash)
+    local tree2 = readTree(tree2Hash)
+    local tree1Parents = {}
+    local tree2Parents = {}
+    while (table.getn(tree1.parents) or table.getn(tree2.parents)) do
+
+    end
+  end
+
+  local baseMerge = function(tree1Hash, tree2Hash, commonBase)
 
   end
 
-  moonstore.merge = function(commit1, commit2)
-
+  local merge
+  merge = function(tree1Hash, tree2Hash, path)
+    if path then
+      local tree1
+      if tree1Hash then tree1 = readTree(tree1Hash) else tree1 = Tree.new() end
+      tree1.parents = {tree1Hash}
+      local childTreeHash = Tree.childTree(tree1, path.first)
+      Tree.setChildTree(tree1, path.first, merge(childTreeHash, tree2Hash, path.first))
+      return backend.writeTree(tree1)
+    else
+      if tree1Hash then
+        return baseMerge(tree1Hash, tree2Hash, commonBase(tree1Hash, tree2Hash))
+      else
+        return tree2Hash
+      end
+    end
+  end
+  moonstore.merge = function(tree1, tree2, path)
+    local pathList
+    if (path) then pathList = pathToList(path) end
+    return merge(tree1, tree2, path)
   end
 
   moonstore.metaDiff = function(fromCommit, toCommit)
